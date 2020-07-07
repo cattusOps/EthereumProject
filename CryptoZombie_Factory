@@ -1,0 +1,61 @@
+pragma solidity ^0.4.19; //솔리디티 버전을 선언한다
+
+import "./ZombieFactory.sol";
+
+contract ZombieFactory {
+
+    event NewZombie(uint _zombieId, string _name, uint _dna); //이벤트 선언하고 전달받을 인자 입력 ; 빼먹지말자
+       
+
+    uint dnaDigits = 16;
+    uint dnaModulus = 10 ** dnaDigits;
+
+    struct Zombie {   //구조체 : 솔리디티는 구조체를 제공한다. 복잡한 자료형을 필요로 할 때.좀비라는 스트럭트 생성
+        string name;  //좀비라는 구조체는 string형과 uint형이라는 두가지 특성을 가지게 된다.
+        uint dna; 
+    }
+
+     function createZombie(string _name, uint _dna) {   //문자열인 이름 인자를 전달받고 숫자열인 dna를 전달받는다
+
+    }
+
+    Zombie[] public zombies; //동적배열: Zombie라는 곳에 zombies들을 누구나 추가할 수 있다
+                             //솔리디티는 배열을 위해 getter 메소드를 자동적으로 생성한다. 다른 컨트랙트들이 읽기권한만 있다.
+                             // 컨트랙트에 공개 데이터를 저장할 때 유용한 패턴
+    
+     mapping (uint => address) public zombieToOwner; //사용자 추적
+     mapping (address => uint) owenerZombieCount; //어드레스를 넣었을때 좀비를 몇개가지고 있는지
+
+
+     function _createZombie(string _name, uint _dna) private {  #private하게 바꿔주고 앞에 언더바 붙임(관례)
+       
+        uint id = zombies.push(Zombie(_name, _dna)) - 1;  //zombies라는 배열 안에 좀비를 푸쉬(집어넣는다) -->이벤트 선언
+        
+        //앱단에 전달할때 사용가능, 이벤트로도 가능하고 리턴함수도 가능
+        //-1은 새로 추가된 좀비의 인덱스가 된다
+        //msg.sender : 이 함수를 수행하는 계좌 주체의 주소가 들어가는것
+
+        zombieToOwner[id] = msg.sender;
+        owenerZombieCount[msg.sender]++;
+
+        NewZombie(id, _name, _dna); 
+    }
+
+     function _generateRandomDna(string _str) private view returns (uint) {
+        //view 함수 기억하기. 중요. 블록체인사용. 값 읽어오는 역할 가스사용하지 않는다.
+        //pure 함수 자주사용되진 않음
+          
+        uint rand = uint(keccak256(_str_)); //랜덤한 숫자로 암호화
+
+        return rand % dnaModulus;
+    }
+    
+     //랜덤 dna를 받아서 좀비를 새로 만들것이야
+
+     function _createRandomZombie(string _name) public { //name이라는 파라미터(인자)를 전달받고
+
+        require(owenerZombieCount[meg.sender]==0);
+        uint randDna = _generateRandomDna(); 
+        _createRandomZombie(_name, randDna);
+
+}
